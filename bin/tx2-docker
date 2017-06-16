@@ -1,0 +1,40 @@
+#!/bin/bash
+# Copyright (c) 2017, Technica Corporation. All rights reserved.
+
+NV_LIBS="/usr/lib/aarch64-linux-gnu"
+GPU_DEVICES="/dev/nvhost-ctrl \
+             /dev/nvhost-ctrl-gpu \
+             /dev/nvhost-prof-gpu \
+             /dev/nvmap \
+             /dev/nvhost-gpu \
+             /dev/nvhost-as-gpu"
+
+NV_DOCKER_ARGS=""
+
+build_docker_args() {
+        #set the required libraries as volumes on the docker container
+
+        LIB_ARGS=""
+        for lib in $NV_LIBS; do
+                LIB_ARGS="$LIB_ARGS -v $lib:$lib"
+        done
+
+        #set the required devices to be passed through to the container
+        DEV_ARGS=""
+        for dev in $GPU_DEVICES; do
+                DEV_ARGS="$DEV_ARGS --device=$dev"
+        done
+
+        NV_DOCKER_ARGS="$NV_DOCKER_ARGS $LIB_ARGS $DEV_ARGS"
+}
+
+if [[ $# -ge 2 && $1 == "run" ]]; then
+        echo "Running an nvidia docker image"
+        build_docker_args
+
+        echo "docker run $NV_DOCKER_ARGS ${@:2}"
+        docker run $NV_DOCKER_ARGS ${@:2}
+else
+        docker $@
+fi
+
