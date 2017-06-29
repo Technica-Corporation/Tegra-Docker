@@ -217,6 +217,8 @@ These can be passed to the container using the `--device` switch
 #### Driver Library Files
 The Containers also need access to the drivers.  For Tegra these are located in `/usr/lib/aarch64-linux-gnu/tegra`.  You should add this to the container using the `-v` command line switch.
 
+The `/usr/lib/aarch64-linux-gnu/tegra` directory contains libraries that will be loaded dynamically by the CUDA appliations.  This path should also be added to the LD_LIBRARY_PATH environment variable in your Dockerfile as well.
+
 Will most likely also need access to other libraries depending on your GPU program.  Specifically you will need access to the CUDA runtime libraries.  Up to you if you want to install the CUDA libraries on the host and pass those through to the container as a volume or to build that into the image.
 
 #### Running Device Query
