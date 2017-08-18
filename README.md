@@ -17,9 +17,8 @@ To get this working you'll need to compile a custom L4T kernel with the correct 
 ### Kernel Configuration
 Based on the information in this thread on the TX-2 development board, [Docker on the TX2](https://devtalk.nvidia.com/default/topic/1000224/jetson-tx2/docker-on-the-tx2/), we were able to get Docker running on the TX-2.
 
-There are multiple ways to compile the kernel and if you have never done this before it can be intimidating, but it isn't too difficult.  If you want to compile the kernel on the TX-2 device then you can follow these instructions: [buildJetsonTX2Kernel](https://github.com/jetsonhacks/buildJetsonTX2Kernel).  Just make sure to use this custom [config](https://github.com/frankjoshua/buildJetsonTX2Kernel/blob/master/docker_config/config) file so that it will enable the Docker options in the kernel.  
+There are multiple ways to compile the kernel and if you have never done this before it can be intimidating, but it isn't too difficult.  If you want to compile the kernel on the TX-2 device then you can follow these instructions: [buildJetsonTX2Kernel](https://github.com/jetsonhacks/buildJetsonTX2Kernel).  Just make sure to use this custom [config](https://github.com/frankjoshua/buildJetsonTX2Kernel/blob/master/docker_config/config) file so that it will enable the Docker options in the kernel.  Just note that this is for the older kernel present in JetPack 3.0, so some of the instruction below would need to be adjusted accordingly.
 
-We took this a little further and enabled more options as we were also trying to get LXC and LXD to run on the TX-2.  There are additional parameters needed to enable these to work.  This updated kernel configuration is available in kernel_config/config.  Using this kernel and loading on the TX-2 will pass all checks in the lxc-checkconfig script.  We have not taken the time to properly get LXC or LXD working on the TX-2 but this should be a good first step is someone that needs this.
 We did not compile on the TX-2 but rather chose to cross compile our kernel from another Linux host.  NVIDIA recommends that you use Ubuntu 14.04 for this, but we were successfully able to run using Ubuntu 16.04.
 
 #### Kernel Compilation
@@ -29,25 +28,27 @@ To compile a custom kernel for the TX-2 on a x86 Ubuntu 16.04 machine:
 1. Create a directory called `kernel_build` on your Linux machine to contain the build files. Will refer to this directory as `$BUILD_ROOT`.  Change into this directory to make it your working directory.
 
     **NOTE:  Might be helpful to set an environment variable called $BUILD_ROOT that points to your kernel_build directory.**
-2. Download the Latest Driver Package from NVIDIA, [L4T Jetson TX2 Driver Package, 27.1](http://developer.nvidia.com/embedded/dlc/l4t-jetson-tx2-driver-package-27-1) and copy to `$BUILD_ROOT`
+2. Download the Latest Driver Package from NVIDIA, [L4T Jetson TX2 Driver Package, 28.1](https://developer.nvidia.com/embedded/dlc/l4t-jetson-tx2-driver-package-28-1) and copy to `$BUILD_ROOT`
 3. Uncompress into your `$BUILD_ROOT` directory:
 ```
-tar -jxvf Tegra186_Linux_R27.1.0_aarch64.tbz2
+tar -jxvf Tegra186_Linux_R28.1.0_aarch64.tbz2
 ```
-4. Change into the `$BUILD_ROOT/Linux_for_Tegra` directory and run the `source_sync.sh` script.  This will download the latest kernel sources using GIT.  When prompted to enter a tag use `tegra-l4t-r27.1`.  You will need to enter the tag five or six different times for each of the projects needed to compile the kernel.
-5. Download the GCC Toolchain, [l4t-gcc-toolchain-64-bit-27-1](https://developer.nvidia.com/embedded/dlc/l4t-gcc-toolchain-64-bit-27-1) and copy to `$BUILD_ROOT`
+4. Change into the `$BUILD_ROOT/Linux_for_Tegra` directory and run the `source_sync.sh` script.  This will download the latest kernel sources using GIT.  When prompted to enter a tag use `tegra-l4t-r28.1`.  You will need to enter the tag five or six different times for each of the projects needed to compile the kernel.
+5. Download the GCC Toolchain, [l4t-gcc-toolchain-64-bit-28-1](https://developer.nvidia.com/embedded/dlc/l4t-gcc-toolchain-64-bit-28-1) and copy to `$BUILD_ROOT`
 6. Uncompress the Toolchain into a directory called `toolchain`:
 ```
 mkdir $BUILD_ROOT/toolchain
-tar -xvf l4t-gcc-toolchain-64-bit-27-1.tar -C toolchain
+tar -xvf gcc-4.8.5-aarch64.solitairetheme8 -C toolchain
 ```
+**NOTE:  It appears that the toolchain file currently downloading is called 'gcc-4.8.5-aarch64.solitairetheme8' which is probably a mistake.  If/When NVIDIA fixes this, make just uncompress the correct name that was downloaded.**
+
 7. Set the following environment variables
 ```
 export CROSS_COMPILE=$BUILD_ROOT/toolchain/install/bin/aarch64-unknown-linux-gnu-
 export TEGRA_KERNEL_OUT=$BUILD_ROOT/kernel-out
 export ARCH=arm64
 ```
-8. Copy the custom kernel config file (.config) into the $TEGRA_KERNEL_OUT directory.  Use at a minimum this [.config](https://github.com/frankjoshua/buildJetsonTX2Kernel/blob/master/docker_config/config) which will enable core Docker functionality, or this [.config](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/kernel_config/config) for additional options to potentially also get LXC and LXD working.
+8. Copy the custom kernel config file (.config) into the $TEGRA_KERNEL_OUT directory,  [.config](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/kernel_config/config).
 9. Change into the kernel source directory
 ```
 cd $BUILD_ROOT/Linux_for_Tegra/sources/kernel/kernel-4.4
@@ -87,7 +88,7 @@ sudo tar -jxvf kernel_supplements.tbz2
 ```
 uname -a
 ```
-Should show it is either running `4.4.15-docker+` or `4.4.15-container+` depending on which `.config ` file was used to compile the kernel.
+Should show it is running `4.4.38-container+`.
 
 #### Docker Installation
 Now that the kernel is updated you can install Docker.
