@@ -40,7 +40,7 @@ tar -jxvf Tegra186_Linux_R28.1.0_aarch64.tbz2
 mkdir $BUILD_ROOT/toolchain
 tar -xvf gcc-4.8.5-aarch64.solitairetheme8 -C toolchain
 ```
-**NOTE:  It appears that the toolchain file currently downloading is called 'gcc-4.8.5-aarch64.solitairetheme8' which is probably a mistake.  If/When NVIDIA fixes this, make just uncompress the correct name that was downloaded.**
+**NOTE:  It appears that the toolchain file currently downloading is called 'gcc-4.8.5-aarch64.solitairetheme8' which is probably a mistake.  If/When NVIDIA fixes this, just uncompress the correct name that was downloaded.**
 
 7. Set the following environment variables
 ```
@@ -48,7 +48,7 @@ export CROSS_COMPILE=$BUILD_ROOT/toolchain/install/bin/aarch64-unknown-linux-gnu
 export TEGRA_KERNEL_OUT=$BUILD_ROOT/kernel-out
 export ARCH=arm64
 ```
-8. Copy the custom kernel config file (.config) into the $TEGRA_KERNEL_OUT directory,  [.config](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/kernel_config/config).
+8. Copy the custom kernel config file ([.config](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/kernel_config/config) into the $TEGRA_KERNEL_OUT directory.
 9. Change into the kernel source directory
 ```
 cd $BUILD_ROOT/Linux_for_Tegra/sources/kernel/kernel-4.4
