@@ -8,7 +8,7 @@ Not one to be discouraged, we set out to learn what was needed to make this happ
 
 ## Challenges
 There are several challenges we had to overcome in order to get this working correctly:
-1. The stock kernel that is deployed when flashing the TX-2 does not have all of the kernel options necessary for containers to work on TX-2 devices.
+1. The stock kernel that is deployed when flashing the TX-2 does not have all of the kernel options necessary for containers to work on TX-2 devices.  With the release of JetPack 3.2, this has been fixed.  The L4T version that is shipped with JetPack 3.2 contains the necessary kernel options for Docker to run.
 2. The NVIDIA drivers work much differently on the TX-2 than on a normal Linux system.  The nvidia-docker wrapper written by NVIDIA will not work on the TX-2.  The nvidia-docker project basically wraps Docker commands and sets up the environment correctly so that Docker containers will have access to the GPU.  Without this your GPU programs will not work on TX-2.
 
 ## Solution
@@ -20,6 +20,8 @@ Based on the information in this thread on the TX-2 development board, [Docker o
 There are multiple ways to compile the kernel and if you have never done this before it can be intimidating, but it isn't too difficult.  If you want to compile the kernel on the TX-2 device then you can follow these instructions: [buildJetsonTX2Kernel](https://github.com/jetsonhacks/buildJetsonTX2Kernel).  Just make sure to use this custom [config](https://github.com/frankjoshua/buildJetsonTX2Kernel/blob/master/docker_config/config) file so that it will enable the Docker options in the kernel.  Just note that this is for the older kernel present in JetPack 3.0, so some of the instruction below would need to be adjusted accordingly.
 
 We did not compile on the TX-2 but rather chose to cross compile our kernel from another Linux host.  NVIDIA recommends that you use Ubuntu 14.04 for this, but we were successfully able to run using Ubuntu 16.04.
+
+**NOTE: NVIDIA has recently released JetPack 3.2 that has Docker support built into their kernel.  If you are using JetPack 3.2 you do not need to do your own custom kernel compilation to get Docker to run. Just flash your TX-2 with the latest L4T release and skip to the Docker Installation section **
 
 #### Kernel Compilation
 To compile a custom kernel for the TX-2 on a x86 Ubuntu 16.04 machine:
@@ -126,7 +128,7 @@ Let's build a simple image with deviceQuery so that we can test Docker's ability
 1. Build the deviceQuery sample which is located in /usr/local/cuda/samples/1_Utilities/deviceQuery
 ```
 cd /usr/local/cuda/samples/1_Utilities/deviceQuery
-make
+sudo make
 ```
 This will create the deviceQuery executable.  If you run this on the native machine, it will give you information about the GPU on the TX-2
 
