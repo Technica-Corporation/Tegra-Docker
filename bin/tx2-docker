@@ -1,7 +1,13 @@
 #!/bin/bash
 # Copyright (c) 2017, Technica Corporation. All rights reserved.
 
-NV_LIBS="/usr/lib/aarch64-linux-gnu"
+NV_LIBS="/usr/lib/aarch64-linux-gnu \
+	 /usr/local/cuda/lib64"
+
+LD_PATH="/usr/lib/aarch64-linux-gnu \
+         /usr/lib/aarch64-linux-gnu/tegra \
+         /usr/local/cuda/lib64"
+
 GPU_DEVICES="/dev/nvhost-ctrl \
              /dev/nvhost-ctrl-gpu \
              /dev/nvhost-prof-gpu \
@@ -9,7 +15,7 @@ GPU_DEVICES="/dev/nvhost-ctrl \
              /dev/nvhost-gpu \
              /dev/nvhost-as-gpu"
 
-NV_DOCKER_ARGS=""
+NV_DOCKER_ARGS="--net=host"
 
 build_docker_args() {
         #set the required libraries as volumes on the docker container
@@ -28,12 +34,22 @@ build_docker_args() {
         NV_DOCKER_ARGS="$NV_DOCKER_ARGS $LIB_ARGS $DEV_ARGS"
 }
 
+build_env() {
+        #build the LD_LIBRARY_PATH
+        LD_LIBRARY_PATH=""
+        for lib in $LD_PATH; do
+                LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$lib"
+        done
+}
+
 if [[ $# -ge 2 && $1 == "run" ]]; then
         echo "Running an nvidia docker image"
         build_docker_args
+	build_env
 
-        echo "docker run $NV_DOCKER_ARGS ${@:2}"
-        docker run $NV_DOCKER_ARGS ${@:2}
+	DOCKER_OPTS="-e LD_LIBRARY_PATH=$LD_LIBRARY_PATH $NV_DOCKER_ARGS ${@:2}"
+        echo "docker run $DOCKER_OPTS"
+        docker run $DOCKER_OPTS
 else
         docker $@
 fi

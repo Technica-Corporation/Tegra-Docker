@@ -233,8 +233,33 @@ docker run --device=/dev/nvhost-ctrl --device=/dev/nvhost-ctrl-gpu --device=/dev
 
 This should result in deviceQuery successfully being run inside of the Docker container.
 
-
 #### Wrapper Script
 We've created a very simple wrapper script called [tx2-docker](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/bin/tx2-docker) that will wrap your Docker commands with the specific command line parameters needed to give GPU access to Docker containers.  This is a VERY simplified version of what the nvidia-docker project does.  
 
 To launch a Docker container that needs GPU access just run: `tx2-docker run <image_name>`.  If you container needs any additional libraries, just need to add the directory or library to the `NV_LIBS` variable for it to be included as a volume.
+
+#### Containerizing Graphic Programs
+If you are trying to containerize an application that displays in a window, you will need to run your container in host mode (```--net=host```) and you will have to make sure that your xserver is accepting connections from other hosts (```xhost+```).  As an example, follow these steps to run the Particles example from the CUDA distribution:
+1. Change to the particles example directory in your CUDA distribution: 
+```
+% cd /usr/local/cuda/samples/5_Simulations/particles
+```
+2. Compile the particles executible:
+```
+% make
+```
+3. Create a directory for the image creation
+4. Copy the ```/usr/local/cuda/samples/5_Simulations/particles/particles``` executable to this directory
+5. Copy this [Dockerfile](https://github.com/Technica-Corporation/Tegra-Docker/blob/master/docker/samples/particles/Dockerfile) to the directory
+6. Create the image
+```
+% docker build -t particles .
+```
+7. Allow remote x hosts
+```
+% xhost +
+```
+8. Run the image
+```
+% tx2-docker run particles
+```
