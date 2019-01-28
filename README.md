@@ -97,7 +97,7 @@ Now that the kernel is updated you can install Docker.
 
 1. Add the following line to the bottom of your `/etc/apt/sources.list`
 ```
-deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+deb [arch=arm64] https://download.docker.com/linux/ubuntu xenial stable
 ```
 2. Update the package lists
 ```
